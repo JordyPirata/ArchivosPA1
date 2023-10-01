@@ -9,6 +9,10 @@ partial class Program
         // Read the entire contents of the file
         (filePath, content) = FileScanner();
 
+        // Print the maximum palindrome
+        (var length, var maxPalindrome) = MaximumPalindrome(content);
+        WriteLine($"The longest palindrome '{maxPalindrome}' has {length} characters");
+
         // Count the vocals
         var newContent = Process(content);
 
@@ -17,10 +21,6 @@ partial class Program
 
         // Print the results
         WriteLine($"The file has the following content:\n{newContent}");
-
-        // Print the maximum palindrome
-        (var length, var maxPalindrome) = MaximumPalindrome(content);
-        WriteLine($"The longest palindrome '{maxPalindrome}' has {length} characters");
     }
 
     private static string Process(string content)
