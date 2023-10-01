@@ -1,60 +1,55 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.IO;
+﻿using System.Text.RegularExpressions;
 using static System.Console;
-using System.Text.RegularExpressions;
 
-class Program
+partial class Program
 {
-    struct Vocals
-    {
-        public int a;
-        public int e;
-        public int i;
-        public int o;
-        public int u;
-    }
     static void Main()
     {
-        string content = string.Empty; 
+        string content, filePath;
         // Read the entire contents of the file
-        content = FileScanner();
+        (filePath, content) = FileScanner();
+
         // Count the vocals
-        Vocals vocals = new Vocals();
-        vocals = CountVocals(content);
+        var newContent = Process(content);
 
-        //Substitute the last vowel with an "@"
-        content = Regex.Replace(content, "a", "@");
-
-        //WriteLine(content);
-        WriteLine($"The file has the following content:\n{content}");
+        // Write the new content to the file
+        File.WriteAllText($"{filePath}.output.txt", newContent);
 
         // Print the results
-        WriteLine($"The file has a vocal 'a' {vocals.a} times");
-        WriteLine($"The file has a vocal 'e' {vocals.e} times");
-        WriteLine($"The file has a vocal 'i' {vocals.i} times");
-        WriteLine($"The file has a vocal 'o' {vocals.o} times");
-        WriteLine($"The file has a vocal 'u' {vocals.u} times");
+        WriteLine($"The file has the following content:\n{newContent}");
+
+        // Print the maximum palindrome
+        (var length, var maxPalindrome) = MaximumPalindrome(content);
+        WriteLine($"The longest palindrome '{maxPalindrome}' has {length} characters");
     }
 
-    static Vocals CountVocals(string content)
+    private static string Process(string content)
     {
-        Vocals vocals = new Vocals();
-        // Count the vocals
-        vocals.a = Regex.Matches(content, "a").Count;
-        vocals.e = Regex.Matches(content, "e").Count;
-        vocals.i = Regex.Matches(content, "i").Count;
-        vocals.o = Regex.Matches(content, "o").Count;
-        vocals.u = Regex.Matches(content, "u").Count;
+        content = ProcessRegex(RegexA(), content);
+        content = ProcessRegex(RegexE(), content);
+        content = ProcessRegex(RegexI(), content);
+        content = ProcessRegex(RegexO(), content);
+        content = ProcessRegex(RegexU(), content);
 
-        return vocals;
+        return content;
     }
-    static string FileScanner()
+
+    private static string ProcessRegex(Regex regex, string content)
     {
-        string? filePath = null;
+        var matches = regex.Matches(content);
+        var count = matches.Count;
+        WriteLine($"The file has {count} '{regex}' characters");
+        var lastMatch = matches[^1].Index;
+        content = content.Remove(lastMatch, 1).Insert(lastMatch, count.ToString());
+        return content;
+    }
+
+    private static (string, string) FileScanner()
+    {
+        string? filePath;
 
         // Prompt the user to enter file path
-        do
-        {
+        do {
             WriteLine("Enter the file path to analize:");
             filePath = ReadLine();
         } while (string.IsNullOrEmpty(filePath));
@@ -62,6 +57,36 @@ class Program
         // Read the entire contents of the file
         string content = File.ReadAllText(filePath);
 
-        return content;
+        return (filePath, content);
     }
+
+    private static bool IsPalindrome(string content)
+    {
+        var reversedContent = new string(content.Reverse().ToArray());
+        return content.Equals(reversedContent, StringComparison.OrdinalIgnoreCase);
+    }
+    
+    private static (int, string) MaximumPalindrome(string content)
+    {
+        var words = content.Split(' ');
+        var palindormes = words.Where(IsPalindrome);
+        var res = palindormes.Max(word => word.Length);
+        var maxPalindrome = palindormes.First(word => word.Length == res);
+        return (res, maxPalindrome);
+    }
+
+    [GeneratedRegex("[aA]")]
+    private static partial Regex RegexA();
+
+    [GeneratedRegex("[eE]")]
+    private static partial Regex RegexE();
+
+    [GeneratedRegex("[iI]")]
+    private static partial Regex RegexI();
+
+    [GeneratedRegex("[oO]")]
+    private static partial Regex RegexO();
+
+    [GeneratedRegex("[uU]")]
+    private static partial Regex RegexU();
 }
