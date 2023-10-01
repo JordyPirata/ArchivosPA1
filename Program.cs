@@ -62,16 +62,26 @@ partial class Program
 
     private static bool IsPalindrome(string content)
     {
-        var reversedContent = new string(content.Reverse().ToArray());
-        return content.Equals(reversedContent, StringComparison.OrdinalIgnoreCase);
+        content = content.ToLower();
+
+        for (int i = 0; i < content.Length; i++) {
+            if (content[i] != content[content.Length - i - 1]) {
+                return false;
+            }
+        }
+
+        return true;
     }
-    
+
     private static (int, string) MaximumPalindrome(string content)
     {
         var words = content.Split(' ');
         var palindormes = words.Where(IsPalindrome);
-        var res = palindormes.Max(word => word.Length);
-        var maxPalindrome = palindormes.First(word => word.Length == res);
+
+        var (res, maxPalindrome) = palindormes.Aggregate((0, ""),
+            (acc, word) => word.Length > acc.Item1 ? (word.Length, word) : acc
+        );
+
         return (res, maxPalindrome);
     }
 
