@@ -10,38 +10,35 @@ partial class Program
         (filePath, content) = FileScanner();
 
         // Print the maximum palindrome
-        (var length, var maxPalindrome) = MaximumPalindrome(content);
+        (var length, var maxPalindrome) = MaximumPalindrome(ref content);
         WriteLine($"The longest palindrome '{maxPalindrome}' has {length} characters");
 
         // Count the vocals
-        var newContent = Process(content);
+        Process(ref content);
 
         // Write the new content to the file
-        File.WriteAllText($"{filePath}.output.txt", newContent);
+        File.WriteAllText($"{filePath}.output.txt", content);
 
         // Print the results
-        WriteLine($"The file has the following content:\n{newContent}");
+        WriteLine($"The file has the following content:\n{content}");
     }
 
-    private static string Process(string content)
+    private static void Process(ref string content)
     {
-        content = ProcessRegex(RegexA(), content);
-        content = ProcessRegex(RegexE(), content);
-        content = ProcessRegex(RegexI(), content);
-        content = ProcessRegex(RegexO(), content);
-        content = ProcessRegex(RegexU(), content);
-
-        return content;
+        ProcessRegex(RegexA(), ref content);
+        ProcessRegex(RegexE(), ref content);
+        ProcessRegex(RegexI(), ref content);
+        ProcessRegex(RegexO(), ref content);
+        ProcessRegex(RegexU(), ref content);
     }
 
-    private static string ProcessRegex(Regex regex, string content)
+    private static void ProcessRegex(Regex regex, ref string content)
     {
         var matches = regex.Matches(content);
         var count = matches.Count;
         WriteLine($"The file has {count} '{regex}' characters");
         var lastMatch = matches[^1].Index;
         content = content.Remove(lastMatch, 1).Insert(lastMatch, count.ToString());
-        return content;
     }
 
     private static (string, string) FileScanner()
@@ -73,7 +70,7 @@ partial class Program
         return true;
     }
 
-    private static (int, string) MaximumPalindrome(string content)
+    private static (int, string) MaximumPalindrome(ref string content)
     {
         var words = content.Split(' ');
         var palindormes = words.Where(IsPalindrome);
