@@ -17,7 +17,7 @@ partial class Program
         Process(ref content);
 
         // Write the new content to the file
-        File.WriteAllText($"{filePath}.output.txt", content);
+        File.WriteAllText(filePath, content);
 
         // Print the results
         WriteLine($"The file has the following content:\n{content}");
@@ -31,7 +31,7 @@ partial class Program
         ProcessRegex(RegexO(), ref content);
         ProcessRegex(RegexU(), ref content);
     }
-
+    // Process the regex and replace the last match with the count
     private static void ProcessRegex(Regex regex, ref string content)
     {
         var matches = regex.Matches(content);
@@ -40,13 +40,14 @@ partial class Program
         var lastMatch = matches[^1].Index;
         content = content.Remove(lastMatch, 1).Insert(lastMatch, count.ToString());
     }
-
+    // Prompt the user to enter file path
     private static (string, string) FileScanner()
     {
         string? filePath;
 
         // Prompt the user to enter file path
-        do {
+        do
+        {
             WriteLine("Enter the file path to analize:");
             filePath = ReadLine();
         } while (string.IsNullOrEmpty(filePath));
@@ -56,44 +57,38 @@ partial class Program
 
         return (filePath, content);
     }
-
+    // Check if the word is a palindrome
     private static bool IsPalindrome(string content)
     {
         content = content.ToLower();
 
-        for (int i = 0; i < content.Length; i++) {
-            if (content[i] != content[content.Length - i - 1]) {
+        for (int i = 0; i < content.Length; i++)
+        {
+            if (content[i] != content[content.Length - i - 1])
+            {
                 return false;
             }
         }
 
         return true;
     }
-
+    // Find the maximum palindrome
     private static (int, string) MaximumPalindrome(ref string content)
     {
         var words = content.Split(' ');
         var palindormes = words.Where(IsPalindrome);
 
-        var (res, maxPalindrome) = palindormes.Aggregate((0, ""),
-            (acc, word) => word.Length > acc.Item1 ? (word.Length, word) : acc
-        );
+        var (res, maxPalindrome) = palindormes.Aggregate((0, ""), (acc, word) =>
+        {
+            return word.Length > acc.Item1 ? (word.Length, word) : acc;
+        });
 
         return (res, maxPalindrome);
     }
 
-    [GeneratedRegex("[aA]")]
-    private static partial Regex RegexA();
-
-    [GeneratedRegex("[eE]")]
-    private static partial Regex RegexE();
-
-    [GeneratedRegex("[iI]")]
-    private static partial Regex RegexI();
-
-    [GeneratedRegex("[oO]")]
-    private static partial Regex RegexO();
-
-    [GeneratedRegex("[uU]")]
-    private static partial Regex RegexU();
+    private static Regex RegexA() => new Regex("[aA]");
+    private static Regex RegexE() => new Regex("[eE]");
+    private static Regex RegexI() => new Regex("[iI]");
+    private static Regex RegexO() => new Regex("[oO]");
+    private static Regex RegexU() => new Regex("[uU]");
 }
