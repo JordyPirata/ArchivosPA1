@@ -27,7 +27,7 @@ namespace Archivos
             // Read the entire contents of the file
             string content = File.ReadAllText(filePath);
 
-            return (filePath, content);
+            return (content,filePath);
         }
     }
 }
