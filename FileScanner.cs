@@ -15,17 +15,57 @@ namespace Archivos
         // Prompt the user to enter file path 
         private static (string,string) Scanner()
         {
-            string? filePath;
-
+            string? filePath = string.Empty;
+            
             // Prompt the user to enter file path
-            do
+            try
             {
                 WriteLine("Enter the file path to analize:");
-                filePath = ReadLine();
-            } while (string.IsNullOrEmpty(filePath));
+                filePath = ReadLine() ?? string.Empty;
+            }
+            catch (Exception e)
+            {
+                WriteLine($"The file path is not valid: {e}");
+                throw;
+            }
+            finally 
+            { 
+                while (string.IsNullOrEmpty(filePath))
+                {
+                    WriteLine("Enter the file path to analize:");
+                    filePath = ReadLine() ?? string.Empty;
+                }
+            }
 
             // Read the entire contents of the file
-            string content = File.ReadAllText(filePath);
+            string? content = string.Empty;
+            try
+            {
+                content = File.ReadAllText(filePath ?? throw new ArgumentNullException(nameof(filePath)));
+            }
+            catch(FileNotFoundException)
+            {
+                WriteLine($"The file content in the path {filePath} not found:");
+                Environment.Exit(1);
+            }
+            catch (ArgumentNullException)
+            {
+                WriteLine($"The file content in the path {filePath} is null:");
+                Environment.Exit(1);
+            }catch(UnauthorizedAccessException)
+            {
+                WriteLine($"The file content in the path {filePath} is not accessible:");
+                Environment.Exit(1);
+                
+            }catch(DirectoryNotFoundException)
+            {
+                WriteLine($"The file content in the path {filePath} is not found:");
+                Environment.Exit(1);
+                
+            }catch(PathTooLongException){
+                WriteLine($"The file content in the path {filePath} is too long:");
+                Environment.Exit(1);
+            }
 
             return (content,filePath);
         }
