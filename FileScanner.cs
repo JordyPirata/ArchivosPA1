@@ -26,7 +26,7 @@ namespace Archivos
             catch (Exception e)
             {
                 WriteLine($"The file path is not valid: {e}");
-                throw;
+                Environment.Exit(1);
             }
             finally 
             { 
@@ -64,6 +64,9 @@ namespace Archivos
                 
             }catch(PathTooLongException){
                 WriteLine($"The file content in the path {filePath} is too long:");
+                Environment.Exit(1);
+            }catch(Exception e){
+                WriteLine($"Something went wrong: {e}");
                 Environment.Exit(1);
             }
 
